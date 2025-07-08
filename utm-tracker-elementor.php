@@ -62,20 +62,28 @@ add_action('elementor_pro/init', function () {
         wp_enqueue_script('utm-tracker-script');
     });
 
-    // Hook into Elementor Pro Forms submission
-    add_action('elementor_pro/forms/new_record', function ($record, $handler) {
+    // Use elementor_pro/forms/process to add the query param fields
+    add_action('elementor_pro/forms/process', function ($record, $ajax_handler) {
         if (! $record instanceof \ElementorPro\Modules\Forms\Classes\Form_Record) {
             return;
         }
 
+        // Get current form fields data
+        $fields = $record->get('fields');
+
         foreach ($_COOKIE as $cookie_name => $cookie_value) {
             if (strpos($cookie_name, 'qp_') === 0) {
                 $param_name = substr($cookie_name, 3);
-                $handler->add_field([
-                    'id'    => $param_name,
+
+                // Add the query param to fields array
+                $fields[$param_name] = [
+                    'id' => $param_name,
                     'value' => sanitize_text_field($cookie_value),
-                ]);
+                ];
             }
         }
+
+        // Update the fields on the record so that the new fields get saved and sent via email etc.
+        $record->update(['fields' => $fields]);
     }, 10, 2);
 });
