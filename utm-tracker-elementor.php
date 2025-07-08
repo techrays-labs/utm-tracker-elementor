@@ -18,11 +18,11 @@ add_action('plugins_loaded', function () {
     add_action('init', function () {
 
         $elementor_pro_loaded = did_action('elementor_pro/init') ? '✅ Yes' : '❌ No';
-        $record_class_exists = class_exists('\ElementorPro\Modules\Forms\Classes\Record') ? '✅ Yes' : '❌ No';
+        $record_class_exists = class_exists('\ElementorPro\Modules\Forms\Classes\Form_Record') ? '✅ Yes' : '❌ No';
 
         if (
             ! did_action('elementor_pro/init') ||
-            ! class_exists('\ElementorPro\Modules\Forms\Classes\Record')
+            ! class_exists('\ElementorPro\Modules\Forms\Classes\Form_Record')
         ) {
             add_action('admin_notices', function () use ($elementor_pro_loaded, $record_class_exists) {
                 echo '<div class="notice notice-error">';
