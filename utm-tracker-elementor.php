@@ -14,22 +14,41 @@
 
 defined('ABSPATH') || exit;
 
-// Wait until Elementor is fully initialized
-add_action('elementor/init', function () {
+add_action('plugins_loaded', function () {
+    add_action('init', function () {
 
-    // Check if Elementor Pro and its Forms module is available
-    if (
-        ! did_action('elementor_pro/init') ||
-        ! class_exists('\ElementorPro\Modules\Forms\Classes\Record')
-    ) {
-        // Show admin notice if Elementor Pro not found
+        $elementor_pro_loaded = did_action('elementor_pro/init') ? '✅ Yes' : '❌ No';
+        $record_class_exists = class_exists('\ElementorPro\Modules\Forms\Classes\Record') ? '✅ Yes' : '❌ No';
+
+        if (
+            ! did_action('elementor_pro/init') ||
+            ! class_exists('\ElementorPro\Modules\Forms\Classes\Record')
+        ) {
+            add_action('admin_notices', function () use ($elementor_pro_loaded, $record_class_exists) {
+                echo '<div class="notice notice-error">';
+                echo '<p><strong>Universal Query Param Tracker:</strong> Elementor Pro is <span style="color:red;">not fully loaded</span>.</p>';
+                echo '<ul>';
+                echo '<li>🔍 <strong>did_action(\'elementor_pro/init\'):</strong> ' . $elementor_pro_loaded . '</li>';
+                echo '<li>📦 <strong>Record Class Exists:</strong> ' . $record_class_exists . '</li>';
+                echo '</ul>';
+                echo '<p>Please ensure that Elementor Pro is <strong>installed, activated, and up to date</strong>.</p>';
+                echo '</div>';
+            });
+            return;
+        }
+    });
+});
+
+// Use elementor_pro/init hook to ensure Elementor Pro is loaded before we proceed
+add_action('elementor_pro/init', function () {
+
+    // Check if Elementor Pro Forms Record class exists (correct class name)
+    if (! class_exists('\ElementorPro\Modules\Forms\Classes\Form_Record')) {
         add_action('admin_notices', function () {
-            echo '<div class="notice notice-error"><p><strong>Universal Query Param Tracker</strong> requires <a href="https://elementor.com/pro" target="_blank">Elementor Pro</a> to function properly.</p></div>';
+            echo '<div class="notice notice-error"><p><strong>Universal Query Param Tracker</strong> requires Elementor Pro Forms module to be loaded.</p></div>';
         });
         return;
     }
-
-    // ✅ Safe to run plugin logic now
 
     // Enqueue the JS script to store query parameters
     add_action('wp_enqueue_scripts', function () {
@@ -45,7 +64,7 @@ add_action('elementor/init', function () {
 
     // Hook into Elementor Pro Forms submission
     add_action('elementor_pro/forms/new_record', function ($record, $handler) {
-        if (! $record instanceof \ElementorPro\Modules\Forms\Classes\Record) {
+        if (! $record instanceof \ElementorPro\Modules\Forms\Classes\Form_Record) {
             return;
         }
 
