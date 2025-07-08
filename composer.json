@@ -1,0 +1,14 @@
+{
+  "name": "techrayslabs/utm-tracker-elementor",
+  "description": "Capture all query parameters and inject them into Elementor form submissions.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "Techrays Labs Private Limited",
+      "email": "tech@techrayslabs.com",
+      "homepage": "https://techrayslabs.com"
+    }
+  ],
+  "require": {}
+}
