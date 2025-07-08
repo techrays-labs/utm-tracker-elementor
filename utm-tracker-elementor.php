@@ -84,6 +84,6 @@ add_action('elementor_pro/init', function () {
         }
 
         // Update the fields on the record so that the new fields get saved and sent via email etc.
-        $record->update(['fields' => $fields]);
+        $record->set('fields', $fields);
     }, 10, 2);
 });
